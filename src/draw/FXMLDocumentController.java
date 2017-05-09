@@ -5,8 +5,13 @@
  */
 package draw;
 
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
@@ -15,8 +20,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -24,10 +32,12 @@ import javafx.scene.paint.Color;
  */
 public class FXMLDocumentController implements Initializable {
     
+    private Canvas currentTabCanvas;
     @FXML
     Tab tbAdd;
     @FXML
     TabPane tpMain;
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
@@ -35,13 +45,35 @@ public class FXMLDocumentController implements Initializable {
         onActionPerform();
     }    
 
+    @FXML
+    private void mnuSave(Event e){
+        FileChooser fileChooser = new FileChooser();
+         //Set extension filter
+                FileChooser.ExtensionFilter extFilter = 
+                        new FileChooser.ExtensionFilter("png files (*.png)", "*.png");
+                fileChooser.getExtensionFilters().add(extFilter);
+               File file = fileChooser.showSaveDialog(tpMain.getScene().getWindow());
+              if(file != null){
+                    try {
+                        WritableImage writableImage = new WritableImage((int)currentTabCanvas.getHeight(), (int)currentTabCanvas.getWidth());
+                        currentTabCanvas.snapshot(null, writableImage);
+                        RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
+                        ImageIO.write(renderedImage, "png", file);
+                    } catch (IOException ex) {
+                       ex.printStackTrace();
+                    }
+                }
+            
+    }
     private void onActionPerform() {
         tbAdd.setOnSelectionChanged(elent->{
         //Create Tabs
       Tab tab = new Tab();
+    
       tab.setText("untitled");
       tab.setClosable(true);
       Canvas  c = new Canvas(400,400);
+      currentTabCanvas = c;
       ScrollPane sp = new ScrollPane();
      sp.setContent(c);
      sp.setPannable(true);
@@ -55,11 +87,13 @@ public class FXMLDocumentController implements Initializable {
 
     private void initializeFirstPage() {
          Tab tab = new Tab();
+         
       tab.setText("untitled");
       tab.setClosable(true);
        //Add something in Tab
     
        Canvas  c = new Canvas(400,400);
+       currentTabCanvas = c;
      c.setCursor(Cursor.DEFAULT);
       ScrollPane sp = new ScrollPane();
      sp.setContent(c);
