@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -69,11 +71,11 @@ public class FXMLDocumentController implements Initializable {
         tbAdd.setOnSelectionChanged(elent->{
         //Create Tabs
       Tab tab = new Tab();
-    
+   
       tab.setText("untitled");
       tab.setClosable(true);
       Canvas  c = new Canvas(400,400);
-      currentTabCanvas = c;
+     currentTabCanvas = c;
       ScrollPane sp = new ScrollPane();
      sp.setContent(c);
      sp.setPannable(true);
@@ -82,6 +84,11 @@ public class FXMLDocumentController implements Initializable {
       tpMain.getTabs().add(tpMain.getTabs().size()-1,tab);
      tpMain.getSelectionModel().select(tab);
     
+        });
+        
+       tpMain.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+           ScrollPane ss = ((ScrollPane)tpMain.getSelectionModel().getSelectedItem().getContent());
+           currentTabCanvas = (Canvas)ss.getContent();
         });
     }
 
